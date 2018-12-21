@@ -1,0 +1,24 @@
+language: python
+python:
+- '3.6'
+services:
+- docker
+env:
+  global:
+  - REPO=danie1cohen/hass
+
+script:
+# make the build use qemu so arm
+- docker run --rm --privileged multiarch/qemu-user-static:register --reset
+- docker pull $REPO && docker build . -t $REPO --cache-from $REPO || docker build . -t $REPO >/dev/null
+- docker run $REPO hass --version
+
+before_deploy:
+- docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+- docker tag $REPO:latest
+
+deploy:
+  provider: script
+  script: docker push $REPO
+  on:
+    branch: master
