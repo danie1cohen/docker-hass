@@ -11,7 +11,9 @@ before_script:
 # make the build use qemu so arm
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-- docker build . -t $REPO:v$TRAVIS_BUILD_NUMBER
+- docker pull $REPO
+- docker build . -t $REPO:v$TRAVIS_BUILD_NUMBER --cache-from $REPO
+
 
 script:
 - docker run $REPO:v$TRAVIS_BUILD_NUMBER hass --version
@@ -21,6 +23,6 @@ before_deploy:
 
 deploy:
   provider: script
-  script: docker push $REPO
+  script: docker push $REPO:latest
   on:
     branch: master
