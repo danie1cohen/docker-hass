@@ -11,7 +11,7 @@ before_script:
 # make the build use qemu so arm
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-- docker pull $REPO && docker build . -t $REPO --cache-from $REPO || docker build . -t $REPO >/dev/null
+- docker build . -t $REPO
 
 script:
 - docker run $REPO hass --version
