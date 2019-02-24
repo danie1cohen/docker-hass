@@ -12,27 +12,30 @@
 #
 FROM resin/rpi-raspbian:latest
 
+RUN mkdir -p /config
+WORKDIR /config
+
+# ui port, wemo discovery
+EXPOSE 8123 8989
+
 RUN apt-get -q update && apt-get -qy install \
   build-essential \
   libffi-dev \
   libssl-dev \
   curl
 
-RUN curl -o /tmp/Python-3.6.0.tar.xz https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz && \
+RUN curl -o \
+  /tmp/Python-3.6.0.tar.xz \
+  https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz && \
   cd /tmp && \
-  tar xvf Python-3.6.0.tar.xz && \
+  tar xf Python-3.6.0.tar.xz && \
   cd Python-3.6.0/ && \
-  ./configure && \
+  ./configure >/dev/null && \
   make install
 
-RUN mkdir /config
-WORKDIR /config
-
-# open ui port
-EXPOSE 8123
-
-# expose 8989 for wemo discovery
-EXPOSE 8989
+RUN ln -sfn $(which python3.6) /usr/local/bin/python
+RUN ln -sfn $(which pip3) /usr/local/bin/pip
+RUN python --version | grep 3.6
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
